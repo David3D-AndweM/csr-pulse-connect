@@ -1,0 +1,72 @@
+
+export type CSRProject = {
+  id: string;
+  title: string;
+  description: string;
+  status: 'planned' | 'in-progress' | 'completed' | 'cancelled';
+  progress: number;
+  location: string;
+  category: string;
+  budget: number;
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  assignedUsers: User[];
+};
+
+export type User = {
+  id: string;
+  name: string;
+  role: 'admin' | 'csr_manager' | 'editor' | 'recipient' | 'public';
+  email: string;
+  avatar?: string;
+};
+
+export type Report = {
+  id: string;
+  projectId: string;
+  recipientId: string;
+  summary: string;
+  documentUrl?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  feedback?: string;
+};
+
+export type NewsPost = {
+  id: string;
+  title: string;
+  content: string;
+  author: User;
+  category: string;
+  imageUrl?: string;
+  publishedAt: string;
+  tags: string[];
+};
+
+export type Region = {
+  id: string;
+  name: string;
+  country: string;
+  projectCount: number;
+};
+
+export type Notification = {
+  id: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  timestamp: string;
+  read: boolean;
+  userId: string;
+};
+
+export type ChartData = {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    backgroundColor?: string | string[];
+    borderColor?: string;
+    borderWidth?: number;
+  }[];
+};
