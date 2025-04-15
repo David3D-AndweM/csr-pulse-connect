@@ -2,7 +2,7 @@
 
 **Corporate Social Responsibility Management Platform**
 
-**URL**: https://lovable.dev/projects/af925a1e-5029-4e21-9199-9e3a09bb98c6
+
 
 ## About This Project
 
