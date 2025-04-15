@@ -1,16 +1,22 @@
 
-import { Bell, Search } from "lucide-react";
+import { Bell, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockNotifications } from "@/data/mockData";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ReactNode } from "react";
 
 const unreadNotifications = mockNotifications.filter(n => !n.read).length;
 
-export function Header() {
+interface HeaderProps {
+  children?: ReactNode;
+}
+
+export function Header({ children }: HeaderProps) {
   return (
     <header className="bg-background border-b py-3 px-6 flex items-center justify-between sticky top-0 z-10">
-      <div className="flex-1">
+      <div className="flex items-center flex-1">
+        {children}
         <div className="relative max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input

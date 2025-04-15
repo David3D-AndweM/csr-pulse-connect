@@ -1,3 +1,4 @@
+
 import { CSRProject, NewsPost, Region, Report, User, Notification } from '../types';
 
 export const mockUsers: User[] = [
@@ -45,6 +46,9 @@ export const mockProjects: CSRProject[] = [
     endDate: '2024-07-15',
     createdAt: '2023-12-10',
     assignedUsers: [mockUsers[0], mockUsers[1]],
+    projectType: 'external',
+    mouId: '1',
+    recipientId: '4',
   },
   {
     id: '2',
@@ -59,6 +63,7 @@ export const mockProjects: CSRProject[] = [
     endDate: '2024-12-15',
     createdAt: '2024-01-20',
     assignedUsers: [mockUsers[1], mockUsers[2]],
+    projectType: 'internal',
   },
   {
     id: '3',
@@ -73,6 +78,9 @@ export const mockProjects: CSRProject[] = [
     endDate: '2025-01-30',
     createdAt: '2024-03-10',
     assignedUsers: [mockUsers[0], mockUsers[3]],
+    projectType: 'external',
+    mouId: '2',
+    recipientId: '5',
   },
   {
     id: '4',
@@ -87,6 +95,7 @@ export const mockProjects: CSRProject[] = [
     endDate: '2024-02-28',
     createdAt: '2023-08-15',
     assignedUsers: [mockUsers[2], mockUsers[3]],
+    projectType: 'internal',
   },
 ];
 
@@ -286,5 +295,86 @@ export const mockRequests = [
     status: "rejected",
     submittedAt: "2024-04-13",
     description: "Workshop space request",
+  },
+];
+
+// New mock data for surveys
+export const mockSurveys = [
+  {
+    id: "SUR001",
+    title: "Clean Water Project Feedback",
+    projectId: "1",
+    projectName: "Clean Water Initiative",
+    status: "active",
+    createdAt: "2024-03-10",
+    expiresAt: "2024-05-10",
+    responseCount: 12,
+    recipientCount: 20,
+  },
+  {
+    id: "SUR002",
+    title: "Educational Materials Quality Survey",
+    projectId: "2",
+    projectName: "Education for All",
+    status: "draft",
+    createdAt: "2024-04-05",
+    expiresAt: "2024-06-05",
+    responseCount: 0,
+    recipientCount: 15,
+  },
+  {
+    id: "SUR003",
+    title: "Community Solar Panel Impact",
+    projectId: "3",
+    projectName: "Green Energy Initiative",
+    status: "closed",
+    createdAt: "2024-02-15",
+    expiresAt: "2024-04-15",
+    responseCount: 25,
+    recipientCount: 30,
+  },
+];
+
+// New mock data for MOUs
+export const mockMOUs = [
+  {
+    id: "MOU001",
+    title: "Water Access Partnership",
+    organizationName: "Village Water",
+    status: "active",
+    startDate: "2024-01-01",
+    endDate: "2025-01-01",
+    projectCount: 2,
+    description: "Partnership to provide clean water access in rural communities",
+  },
+  {
+    id: "MOU002",
+    title: "Solar Energy Deployment",
+    organizationName: "GreenSun Energy",
+    status: "active",
+    startDate: "2024-03-15",
+    endDate: "2025-03-15",
+    projectCount: 1,
+    description: "Collaboration on solar panel installations in community buildings",
+  },
+  {
+    id: "MOU003",
+    title: "Educational Resources Partnership",
+    organizationName: "Learning For All",
+    status: "pending",
+    startDate: "2024-05-01",
+    endDate: "2025-05-01",
+    projectCount: 0,
+    description: "Partnership for providing educational materials to schools",
+  },
+  {
+    id: "MOU004",
+    title: "Healthcare Outreach Program",
+    organizationName: "Health Connect",
+    status: "expired",
+    startDate: "2023-01-01",
+    endDate: "2024-01-01",
+    projectCount: 3,
+    description: "Collaboration on mobile clinic services and healthcare access",
   },
 ];

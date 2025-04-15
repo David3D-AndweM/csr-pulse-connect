@@ -11,6 +11,8 @@ import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Locations from "./pages/Locations";
 import Requests from "./pages/Requests";
+import Surveys from "./pages/Surveys";
+import MOUs from "./pages/MOUs";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +33,8 @@ const App = () => (
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/locations" element={<Locations />} />
             <Route path="/requests" element={<Requests />} />
+            <Route path="/surveys" element={<Surveys />} />
+            <Route path="/mous" element={<MOUs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

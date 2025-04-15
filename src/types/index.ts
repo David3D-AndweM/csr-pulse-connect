@@ -1,3 +1,4 @@
+
 export type CSRProject = {
   id: string;
   title: string;
@@ -11,6 +12,9 @@ export type CSRProject = {
   endDate: string;
   createdAt: string;
   assignedUsers: User[];
+  projectType: 'internal' | 'external';
+  mouId?: string; // For external projects with MOUs
+  recipientId?: string; // For external projects
 };
 
 export type User = {
@@ -78,4 +82,48 @@ export type Request = {
   status: 'pending' | 'approved' | 'rejected';
   submittedAt: string;
   description: string;
+};
+
+// New types for MOU and Survey features
+export type MOU = {
+  id: string;
+  title: string;
+  organizationName: string;
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'expired' | 'pending';
+  projectIds: string[];
+  description: string;
+  documentUrl?: string;
+};
+
+export type Survey = {
+  id: string;
+  title: string;
+  description: string;
+  projectId: string;
+  questions: SurveyQuestion[];
+  createdAt: string;
+  expiresAt: string;
+  status: 'draft' | 'active' | 'closed';
+};
+
+export type SurveyQuestion = {
+  id: string;
+  type: 'multiple_choice' | 'text' | 'rating' | 'yes_no';
+  question: string;
+  options?: string[];
+  required: boolean;
+};
+
+export type SurveyResponse = {
+  id: string;
+  surveyId: string;
+  respondentId: string;
+  respondentName: string;
+  responses: {
+    questionId: string;
+    answer: string | number | boolean;
+  }[];
+  submittedAt: string;
 };

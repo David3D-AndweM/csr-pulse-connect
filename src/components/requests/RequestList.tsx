@@ -35,10 +35,17 @@ export function RequestList() {
                 <Badge
                   variant={
                     request.status === "approved"
-                      ? "success"
+                      ? "secondary"
                       : request.status === "pending"
-                      ? "warning"
+                      ? "outline"
                       : "destructive"
+                  }
+                  className={
+                    request.status === "approved"
+                      ? "bg-green-100 text-green-800 hover:bg-green-200"
+                      : request.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                      : ""
                   }
                 >
                   {request.status}
