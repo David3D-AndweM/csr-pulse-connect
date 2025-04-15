@@ -1,4 +1,3 @@
-
 export type CSRProject = {
   id: string;
   title: string;
@@ -69,4 +68,14 @@ export type ChartData = {
     borderColor?: string;
     borderWidth?: number;
   }[];
+};
+
+export type Request = {
+  id: string;
+  type: 'Facility' | 'Support';
+  requester: string;
+  facility: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  description: string;
 };

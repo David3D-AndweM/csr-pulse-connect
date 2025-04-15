@@ -3,37 +3,39 @@ import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockNotifications } from "@/data/mockData";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const unreadNotifications = mockNotifications.filter(n => !n.read).length;
 
 export function Header() {
   return (
-    <header className="bg-white border-b border-gray-200 py-3 px-6 flex items-center justify-between">
+    <header className="bg-background border-b py-3 px-6 flex items-center justify-between sticky top-0 z-10">
       <div className="flex-1">
         <div className="relative max-w-md">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search..."
-            className="pl-8 bg-gray-50 border-gray-200"
+            className="pl-8 bg-muted/50"
           />
         </div>
       </div>
       
       <div className="flex items-center space-x-4">
-        <Button variant="outline" size="sm" className="border-gray-200">
+        <Button variant="outline" size="sm">
           New Project
         </Button>
         
-        <div className="relative">
+        <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-gray-600" />
+            <Bell className="h-5 w-5" />
             {unreadNotifications > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
                 {unreadNotifications}
               </span>
             )}
           </Button>
+          <ThemeToggle />
         </div>
       </div>
     </header>

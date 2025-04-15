@@ -1,4 +1,3 @@
-
 import { CSRProject, NewsPost, Region, Report, User, Notification } from '../types';
 
 export const mockUsers: User[] = [
@@ -259,3 +258,33 @@ export const monthlyProgressChartData = {
     },
   ],
 };
+
+export const mockRequests = [
+  {
+    id: "REQ001",
+    type: "Facility",
+    requester: "Jane Smith",
+    facility: "Conference Hall A",
+    status: "pending",
+    submittedAt: "2024-04-15",
+    description: "Community meeting space needed",
+  },
+  {
+    id: "REQ002",
+    type: "Support",
+    requester: "Mike Johnson",
+    facility: "Financial Aid",
+    status: "approved",
+    submittedAt: "2024-04-14",
+    description: "Education support program",
+  },
+  {
+    id: "REQ003",
+    type: "Facility",
+    requester: "Sarah Williams",
+    facility: "Training Room B",
+    status: "rejected",
+    submittedAt: "2024-04-13",
+    description: "Workshop space request",
+  },
+];
