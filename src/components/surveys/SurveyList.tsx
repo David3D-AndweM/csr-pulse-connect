@@ -1,4 +1,5 @@
 
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Table,
   TableBody,
@@ -10,9 +11,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { mockSurveys } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
-import { BarChart2, Eye, FileSpreadsheet } from "lucide-react";
+import { BarChart2, Eye, FileSpreadsheet, Send } from "lucide-react";
 
 export function SurveyList() {
+  const { userRole } = useAuth();
+  const isRecipient = userRole === "recipient";
+
   return (
     <div className="bg-card rounded-lg border">
       <Table>
@@ -21,7 +25,7 @@ export function SurveyList() {
             <TableHead>Survey Name</TableHead>
             <TableHead>Project</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Responses</TableHead>
+            {!isRecipient && <TableHead>Responses</TableHead>}
             <TableHead>Created</TableHead>
             <TableHead>Expires</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -52,20 +56,35 @@ export function SurveyList() {
                   {survey.status}
                 </Badge>
               </TableCell>
-              <TableCell>{survey.responseCount}/{survey.recipientCount}</TableCell>
+              {!isRecipient && (
+                <TableCell>{survey.responseCount}/{survey.recipientCount}</TableCell>
+              )}
               <TableCell>{survey.createdAt}</TableCell>
               <TableCell>{survey.expiresAt}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <BarChart2 className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <FileSpreadsheet className="h-4 w-4" />
-                  </Button>
+                  {isRecipient ? (
+                    <>
+                      <Button variant="ghost" size="icon">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="ghost" size="icon">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <BarChart2 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <FileSpreadsheet className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
