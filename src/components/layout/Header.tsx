@@ -1,10 +1,17 @@
 
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, LogOut, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { mockNotifications } from "@/data/mockData";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { ReactNode } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const unreadNotifications = mockNotifications.filter(n => !n.read).length;
 
@@ -13,6 +20,8 @@ interface HeaderProps {
 }
 
 export function Header({ children }: HeaderProps) {
+  const { userEmail, userRole, logout } = useAuth();
+
   return (
     <header className="bg-background border-b py-3 px-6 flex items-center justify-between sticky top-0 z-10">
       <div className="flex items-center flex-1">
@@ -42,6 +51,23 @@ export function Header({ children }: HeaderProps) {
             )}
           </Button>
           <ThemeToggle />
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2">
+                <span className="hidden md:inline-block">{userEmail}</span>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                  {userRole}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

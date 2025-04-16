@@ -1,12 +1,24 @@
 
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { Menu } from "lucide-react";
 import { Button } from "../ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export function Layout({ children }: PropsWithChildren) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { userRole } = useAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!userRole) {
+      navigate("/login");
+    }
+  }, [userRole, navigate]);
+
+  if (!userRole) return null;
   
   return (
     <div className="flex h-screen bg-background">
