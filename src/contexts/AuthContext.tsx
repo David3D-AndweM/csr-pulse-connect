@@ -4,12 +4,14 @@ import { createContext, useContext, ReactNode, useState, useEffect } from "react
 interface AuthContextType {
   userRole: string | null;
   userEmail: string | null;
+  login: (email: string, role: string) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   userRole: null,
   userEmail: null,
+  login: () => {},
   logout: () => {},
 });
 
@@ -28,6 +30,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  const login = (email: string, role: string) => {
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userRole", role);
+    setUserEmail(email);
+    setUserRole(role);
+  };
+
   const logout = () => {
     localStorage.removeItem("userRole");
     localStorage.removeItem("userEmail");
@@ -37,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ userRole, userEmail, logout }}>
+    <AuthContext.Provider value={{ userRole, userEmail, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

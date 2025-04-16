@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { LockKeyhole, Mail } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Demo accounts for testing
 const demoAccounts = {
@@ -36,6 +37,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,9 +48,8 @@ export default function Login() {
     );
 
     if (account) {
-      // Store user role in localStorage for demo purposes
-      localStorage.setItem("userRole", account.role);
-      localStorage.setItem("userEmail", account.email);
+      // Use the login function from AuthContext
+      login(account.email, account.role);
       
       toast.success("Welcome to Clareo Non Profit!");
       

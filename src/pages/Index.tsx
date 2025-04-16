@@ -1,20 +1,32 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
-// This page redirects to the dashboard
+// This page redirects based on user role
 const Index = () => {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
 
   useEffect(() => {
-    // Redirect to dashboard
-    navigate("/dashboard");
-  }, [navigate]);
+    if (userRole) {
+      // Redirect based on role
+      if (userRole === "recipient") {
+        navigate("/projects");
+      } else {
+        navigate("/dashboard");
+      }
+    } else {
+      // Redirect to login if no user
+      navigate("/login");
+    }
+  }, [navigate, userRole]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-csr-primary mb-4">CSR Pulse Connect</h1>
-        <p className="text-gray-600">Loading your dashboard...</p>
+        <h1 className="text-2xl font-bold mb-4">Clareo Non Profit</h1>
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     </div>
   );
