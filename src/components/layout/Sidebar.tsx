@@ -16,28 +16,56 @@ import {
   Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
 }
 
-const navItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard" },
-  { icon: Layers, label: "Projects", href: "/projects" },
-  { icon: ClipboardList, label: "Requests", href: "/requests" },
-  { icon: FileText, label: "Reports", href: "/reports" },
-  { icon: BarChart3, label: "Analytics", href: "/analytics" },
-  { icon: MapPin, label: "Locations", href: "/locations" },
-  { icon: FileBarChart, label: "Surveys", href: "/surveys" }, // New
-  { icon: Globe, label: "MOUs", href: "/mous" }, // New
-  { icon: MessagesSquare, label: "Content", href: "/content" },
-  { icon: Users, label: "User Management", href: "/users" },
-  { icon: Settings, label: "Settings", href: "/settings" },
-];
+// Define menu items for each role
+const roleBasedNavItems = {
+  manager: [
+    { icon: Home, label: "Dashboard", href: "/dashboard" },
+    { icon: Layers, label: "Projects", href: "/projects" },
+    { icon: ClipboardList, label: "Requests", href: "/requests" },
+    { icon: FileText, label: "Reports", href: "/reports" },
+    { icon: BarChart3, label: "Analytics", href: "/analytics" },
+    { icon: MapPin, label: "Locations", href: "/locations" },
+    { icon: FileBarChart, label: "Surveys", href: "/surveys" },
+    { icon: Globe, label: "MOUs", href: "/mous" },
+    { icon: MessagesSquare, label: "Content", href: "/content" },
+    { icon: Users, label: "User Management", href: "/users" },
+    { icon: Settings, label: "Settings", href: "/settings" },
+  ],
+  editor: [
+    { icon: Home, label: "Dashboard", href: "/dashboard" },
+    { icon: MessagesSquare, label: "Content", href: "/content" },
+    { icon: FileText, label: "Reports", href: "/reports" },
+    { icon: Settings, label: "Settings", href: "/settings" },
+  ],
+  me_officer: [
+    { icon: Home, label: "Dashboard", href: "/dashboard" },
+    { icon: FileBarChart, label: "Surveys", href: "/surveys" },
+    { icon: Layers, label: "Projects", href: "/projects" },
+    { icon: BarChart3, label: "Analytics", href: "/analytics" },
+    { icon: FileText, label: "Reports", href: "/reports" },
+    { icon: Settings, label: "Settings", href: "/settings" },
+  ],
+  recipient: [
+    { icon: Layers, label: "My Projects", href: "/projects" },
+    { icon: FileText, label: "Reports", href: "/reports" },
+    { icon: FileBarChart, label: "Surveys", href: "/surveys" },
+    { icon: Settings, label: "Settings", href: "/settings" },
+  ],
+};
 
 export function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const location = useLocation();
+  const { userRole } = useAuth();
+  
+  // Get navigation items based on user role
+  const navItems = userRole ? roleBasedNavItems[userRole as keyof typeof roleBasedNavItems] : [];
 
   return (
     <aside className={`fixed top-0 left-0 z-40 h-screen border-r shadow-sm bg-card transition-all duration-300 ${isOpen ? 'w-64' : 'w-0 md:w-16 overflow-hidden'}`}>

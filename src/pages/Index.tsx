@@ -3,21 +3,34 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-// This page redirects based on user role
 const Index = () => {
   const navigate = useNavigate();
   const { userRole } = useAuth();
 
   useEffect(() => {
     if (userRole) {
-      // Redirect based on role
-      if (userRole === "recipient") {
-        navigate("/projects");
-      } else {
-        navigate("/dashboard");
+      // Enhanced role-based routing
+      switch (userRole) {
+        case "manager":
+          // CSR Manager has full access to dashboard
+          navigate("/dashboard");
+          break;
+        case "editor":
+          // Editor goes to content management
+          navigate("/content");
+          break;
+        case "me_officer":
+          // M&E Officer goes to surveys/monitoring
+          navigate("/surveys");
+          break;
+        case "recipient":
+          // Recipients only see their projects
+          navigate("/projects");
+          break;
+        default:
+          navigate("/login");
       }
     } else {
-      // Redirect to login if no user
       navigate("/login");
     }
   }, [navigate, userRole]);
