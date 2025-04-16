@@ -51,8 +51,8 @@ export function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         <div className="flex items-center justify-center h-16 border-b">
           {isOpen ? (
             <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="bg-primary text-primary-foreground p-1 rounded">CSR</span>
-              <span>Pulse Connect</span>
+              <span className="bg-primary text-primary-foreground p-1 rounded">CL</span>
+              <span>Clareo Non Profit</span>
             </h1>
           ) : (
             <h1 className="text-xl font-bold text-primary flex items-center justify-center">

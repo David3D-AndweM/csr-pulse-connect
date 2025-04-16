@@ -10,10 +10,26 @@ import { LockKeyhole, Mail } from "lucide-react";
 
 // Demo accounts for testing
 const demoAccounts = {
-  manager: { email: "manager@csrpulse.com", password: "manager123", role: "manager" },
-  editor: { email: "editor@csrpulse.com", password: "editor123", role: "editor" },
-  me_officer: { email: "me@csrpulse.com", password: "me123", role: "me_officer" },
-  recipient: { email: "recipient@csrpulse.com", password: "recipient123", role: "recipient" }
+  manager: { 
+    email: "manager@clareo.org", 
+    password: "manager123", 
+    role: "manager" 
+  },
+  editor: { 
+    email: "editor@clareo.org", 
+    password: "editor123", 
+    role: "editor" 
+  },
+  me_officer: { 
+    email: "me@clareo.org", 
+    password: "me123", 
+    role: "me_officer" 
+  },
+  recipient: { 
+    email: "recipient@clareo.org", 
+    password: "recipient123", 
+    role: "recipient" 
+  }
 };
 
 export default function Login() {
@@ -34,7 +50,7 @@ export default function Login() {
       localStorage.setItem("userRole", account.role);
       localStorage.setItem("userEmail", account.email);
       
-      toast.success("Login successful!");
+      toast.success("Welcome to Clareo Non Profit!");
       
       // Redirect based on role
       switch (account.role) {
@@ -56,8 +72,8 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-background/50">
       <Card className="w-full max-w-md p-6">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-bold">CSR Pulse Connect</CardTitle>
-          <p className="text-muted-foreground">Sign in to your account</p>
+          <CardTitle className="text-2xl font-bold">Clareo Non Profit</CardTitle>
+          <p className="text-muted-foreground">Developed by Regtech Foundation</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -97,10 +113,10 @@ export default function Login() {
           <div className="mt-6">
             <p className="text-sm text-muted-foreground mb-2">Demo Accounts:</p>
             <div className="space-y-2 text-sm">
-              <p>CSR Manager: manager@csrpulse.com / manager123</p>
-              <p>Editor: editor@csrpulse.com / editor123</p>
-              <p>M&E Officer: me@csrpulse.com / me123</p>
-              <p>Recipient: recipient@csrpulse.com / recipient123</p>
+              <p>CSR Manager: manager@clareo.org / manager123</p>
+              <p>Editor: editor@clareo.org / editor123</p>
+              <p>M&E Officer: me@clareo.org / me123</p>
+              <p>Recipient: recipient@clareo.org / recipient123</p>
             </div>
           </div>
         </CardContent>

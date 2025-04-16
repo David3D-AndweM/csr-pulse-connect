@@ -1,20 +1,19 @@
-# CSR Pulse Connect
 
-**Corporate Social Responsibility Management Platform**
+# Clareo Non Profit
 
-
+**Zambian Community Impact Management Platform**
 
 ## About This Project
 
-CSR Pulse Connect is a comprehensive Corporate Social Responsibility management platform that helps organizations track and manage their CSR initiatives. The application features:
+Clareo Non Profit is a comprehensive community impact management platform developed by Regtech Foundation to help organizations track and manage their social responsibility initiatives. The application features:
 
-- **Project Management Dashboard:** Track all CSR projects, their status, and progress
-- **Report Management:** Submit and review reports for CSR initiatives
+- **Project Management Dashboard:** Track all community projects, their status, and progress
+- **Report Management:** Submit and review reports for community initiatives
 - **Analytics:** Visualize project data and impact metrics
 - **Multi-location Support:** Manage projects across different regions
 - **User Role Management:** Different access levels for administrators, managers, and contributors
 
-This is a React frontend implementation showcasing the UI design and interaction patterns that would be used in a full-stack CSR management platform.
+This is a React frontend implementation showcasing the UI design and interaction patterns for a Zambian non-profit management platform.
 
 This project is built with:
 
@@ -23,4 +22,4 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
-
+- Developed by Regtech Foundation

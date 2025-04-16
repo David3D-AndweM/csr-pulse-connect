@@ -30,7 +30,7 @@ export function Header({ children }: HeaderProps) {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search..."
+            placeholder="Search Clareo Projects..."
             className="pl-8 bg-muted/50"
           />
         </div>
