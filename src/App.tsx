@@ -17,6 +17,9 @@ import Surveys from "./pages/Surveys";
 import MOUs from "./pages/MOUs";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Content from "./pages/Content";
+import Blog from "./pages/public/Blog";
+import PublicDashboard from "./pages/public/PublicDashboard";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +42,9 @@ const App = () => (
               <Route path="/requests" element={<Requests />} />
               <Route path="/surveys" element={<Surveys />} />
               <Route path="/mous" element={<MOUs />} />
+              <Route path="/content" element={<Content />} />
+              <Route path="/public/blog" element={<Blog />} />
+              <Route path="/public/dashboard" element={<PublicDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
