@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./contexts/AuthContext";
 import Login from "./pages/auth/Login";
@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import Content from "./pages/Content";
 import Blog from "./pages/public/Blog";
 import PublicDashboard from "./pages/public/PublicDashboard";
+import Landing from "./pages/public/Landing";
 
 const queryClient = new QueryClient();
 
@@ -32,8 +33,8 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/reports" element={<Reports />} />
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/content" element={<Content />} />
               <Route path="/public/blog" element={<Blog />} />
               <Route path="/public/dashboard" element={<PublicDashboard />} />
+              <Route path="/app" element={<Index />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
