@@ -6,8 +6,14 @@ import { ProjectsChart } from "@/components/dashboard/ProjectsChart";
 import { RecentActivities } from "@/components/dashboard/RecentActivities";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { mockProjects, projectsByStatusChartData, projectsByCategoryChartData } from "@/data/mockData";
+import { useEffect } from "react";
 
 export default function Dashboard() {
+  // Log when the Dashboard component renders
+  useEffect(() => {
+    console.log("Dashboard component rendered");
+  }, []);
+
   // Get the most recent projects
   const recentProjects = [...mockProjects].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

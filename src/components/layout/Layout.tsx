@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 import { Button } from "../ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 
 // Define role-based route access
 const roleAccess = {
@@ -31,6 +32,7 @@ export function Layout({ children }: PropsWithChildren) {
     
     if (!userRole) {
       console.log("Layout: No user role found, redirecting to login");
+      toast.error("Please login to access this page");
       navigate("/login");
       return;
     }
@@ -43,6 +45,7 @@ export function Layout({ children }: PropsWithChildren) {
     
     if (!allowedRoutes.some(route => currentPath.startsWith(route))) {
       console.log(`Layout: User with role ${userRole} does not have access to ${currentPath}, redirecting to ${allowedRoutes[0]}`);
+      toast.info(`Redirecting to allowed page for your role (${userRole})`);
       // Redirect to first allowed route if current route is not accessible
       navigate(allowedRoutes[0]);
     }
@@ -61,7 +64,17 @@ export function Layout({ children }: PropsWithChildren) {
   }
   
   // If no user role, don't render the layout
-  if (!userRole) return null;
+  if (!userRole) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Clareo Non Profit</h1>
+          <p className="text-muted-foreground">Please login to continue</p>
+          <Button onClick={() => navigate("/login")} className="mt-4">Go to Login</Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="flex h-screen bg-background">
@@ -77,7 +90,9 @@ export function Layout({ children }: PropsWithChildren) {
             <Menu className="h-5 w-5" />
           </Button>
         </Header>
-        <main className="flex-1 overflow-auto p-6 bg-background/50">{children}</main>
+        <main className="flex-1 overflow-auto p-6 bg-background/50">
+          {children}
+        </main>
       </div>
     </div>
   );

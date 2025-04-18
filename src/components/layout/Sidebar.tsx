@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -26,6 +27,19 @@ interface SidebarProps {
 // Define menu items for each role
 const roleBasedNavItems = {
   manager: [
+    { icon: Home, label: "Dashboard", href: "/dashboard" },
+    { icon: Layers, label: "Projects", href: "/projects" },
+    { icon: ClipboardList, label: "Requests", href: "/requests" },
+    { icon: FileText, label: "Reports", href: "/reports" },
+    { icon: BarChart3, label: "Analytics", href: "/analytics" },
+    { icon: MapPin, label: "Locations", href: "/locations" },
+    { icon: FileBarChart, label: "Surveys", href: "/surveys" },
+    { icon: Globe, label: "MOUs", href: "/mous" },
+    { icon: MessagesSquare, label: "Content", href: "/content" },
+    { icon: Users, label: "User Management", href: "/users" },
+    { icon: Settings, label: "Settings", href: "/settings" },
+  ],
+  csr_manager: [
     { icon: Home, label: "Dashboard", href: "/dashboard" },
     { icon: Layers, label: "Projects", href: "/projects" },
     { icon: ClipboardList, label: "Requests", href: "/requests" },
@@ -62,10 +76,18 @@ const roleBasedNavItems = {
 
 export function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const location = useLocation();
-  const { userRole } = useAuth();
+  const { userRole, userEmail, user } = useAuth();
   
+  useEffect(() => {
+    console.log("Sidebar mounted with userRole:", userRole);
+  }, [userRole]);
+
   // Get navigation items based on user role
   const navItems = userRole ? roleBasedNavItems[userRole as keyof typeof roleBasedNavItems] : [];
+
+  if (!navItems.length) {
+    console.warn(`No navigation items found for role: ${userRole}`);
+  }
 
   return (
     <aside className={`fixed top-0 left-0 z-40 h-screen border-r shadow-sm bg-card transition-all duration-300 ${isOpen ? 'w-64' : 'w-0 md:w-16 overflow-hidden'}`}>
@@ -122,20 +144,20 @@ export function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
               <div className="flex-shrink-0">
                 <img
                   className="h-8 w-8 rounded-full"
-                  src="https://ui-avatars.com/api/?name=John+Doe"
+                  src={`https://ui-avatars.com/api/?name=${userEmail || 'User'}`}
                   alt="User"
                 />
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium">John Doe</p>
-                <p className="text-xs text-muted-foreground">Admin</p>
+                <p className="text-sm font-medium">{user?.name || userEmail || 'User'}</p>
+                <p className="text-xs text-muted-foreground">{userRole || 'Guest'}</p>
               </div>
             </div>
           ) : (
             <div className="flex justify-center">
               <img
                 className="h-8 w-8 rounded-full"
-                src="https://ui-avatars.com/api/?name=John+Doe"
+                src={`https://ui-avatars.com/api/?name=${userEmail || 'User'}`}
                 alt="User"
               />
             </div>

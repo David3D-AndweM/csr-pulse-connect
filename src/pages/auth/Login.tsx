@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,26 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, userRole } = useAuth();
+  const { login, userRole, loading } = useAuth();
+
+  // If user is already logged in, redirect them
+  useEffect(() => {
+    if (!loading && userRole) {
+      console.log(`User is already logged in with role: ${userRole}, redirecting...`);
+      
+      // Get the appropriate redirect path based on role
+      const redirectMap: Record<string, string> = {
+        manager: "/dashboard",
+        csr_manager: "/dashboard",
+        editor: "/content",
+        me_officer: "/surveys",
+        recipient: "/projects"
+      };
+      
+      const redirectPath = redirectMap[userRole] || "/dashboard";
+      navigate(redirectPath);
+    }
+  }, [userRole, navigate, loading]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,10 +41,10 @@ export default function Login() {
     
     try {
       await login(email, password);
-      console.log("Login successful, redirecting to dashboard...");
+      console.log("Login successful, redirecting...");
       
-      // Direct navigation to dashboard instead of going through /app
-      navigate("/dashboard");
+      // Login is successful here, but we'll let the useEffect handle redirection
+      // based on user role after auth context updates
     } catch (error) {
       console.error("Login error:", error);
       // Error toast is already shown in the login function
@@ -33,6 +52,17 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+
+  // Show loading while checking auth status
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background/50">
+        <div className="text-center">
+          <p className="text-muted-foreground">Checking authentication status...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background/50">

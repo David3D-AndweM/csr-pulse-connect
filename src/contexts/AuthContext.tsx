@@ -67,7 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await authService.login({ email, password });
       const userData = await authService.getCurrentUser();
       
-      console.log("Login successful. User role:", userData.role);
+      console.log("Login successful. User data:", userData);
+      console.log("User role:", userData.role);
+      
       setUser(userData);
       setUserRole(userData.role);
       setUserEmail(userData.email);
