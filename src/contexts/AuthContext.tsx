@@ -35,10 +35,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userData = await authService.getCurrentUser();
         console.log("User data retrieved:", userData);
         setUser(userData);
-        setUserRole(userData.role);
-        setUserEmail(userData.email);
-        localStorage.setItem("userRole", userData.role);
-        localStorage.setItem("userEmail", userData.email);
+        
+        if (userData && userData.role) {
+          console.log("Setting user role:", userData.role);
+          setUserRole(userData.role);
+          localStorage.setItem("userRole", userData.role);
+        }
+        
+        if (userData && userData.email) {
+          setUserEmail(userData.email);
+          localStorage.setItem("userEmail", userData.email);
+        }
       } catch (error) {
         console.error("Failed to get current user:", error);
         setUser(null);

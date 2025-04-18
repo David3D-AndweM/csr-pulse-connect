@@ -51,6 +51,7 @@ const App = () => {
                   <Route path="/content" element={<Content />} />
                   <Route path="/public/blog" element={<Blog />} />
                   <Route path="/public/dashboard" element={<PublicDashboard />} />
+                  {/* This route redirects to the index page which handles role-based redirections */}
                   <Route path="/app" element={<Index />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

@@ -22,8 +22,10 @@ export default function Login() {
     
     try {
       await login(email, password);
-      console.log("Login successful, redirecting to app...");
-      navigate("/app"); // Redirect to the index page which will handle role-based routing
+      console.log("Login successful, redirecting to dashboard...");
+      
+      // Direct navigation to dashboard instead of going through /app
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
       // Error toast is already shown in the login function
