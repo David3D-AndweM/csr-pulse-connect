@@ -17,26 +17,49 @@ const roleAccess = {
 
 export function Layout({ children }: PropsWithChildren) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { userRole } = useAuth();
+  const { userRole, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   useEffect(() => {
+    // Don't redirect until auth loading is complete
+    if (loading) {
+      console.log("Layout: Auth is still loading, waiting...");
+      return;
+    }
+    
     if (!userRole) {
+      console.log("Layout: No user role found, redirecting to login");
       navigate("/login");
       return;
     }
+    
+    console.log(`Layout: User has role ${userRole}, checking access to ${location.pathname}`);
 
     // Check if user has access to current route
     const allowedRoutes = roleAccess[userRole as keyof typeof roleAccess] || [];
     const currentPath = location.pathname;
     
     if (!allowedRoutes.some(route => currentPath.startsWith(route))) {
+      console.log(`Layout: User with role ${userRole} does not have access to ${currentPath}, redirecting to ${allowedRoutes[0]}`);
       // Redirect to first allowed route if current route is not accessible
       navigate(allowedRoutes[0]);
     }
-  }, [userRole, navigate, location.pathname]);
+  }, [userRole, navigate, location.pathname, loading]);
 
+  // Show loading state while determining permissions
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Clareo Non Profit</h1>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // If no user role, don't render the layout
   if (!userRole) return null;
   
   return (

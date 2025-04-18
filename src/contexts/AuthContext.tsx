@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
+        console.log("Initializing auth and fetching current user...");
         const userData = await authService.getCurrentUser();
         console.log("User data retrieved:", userData);
         setUser(userData);
@@ -46,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem("userRole");
         localStorage.removeItem("userEmail");
       } finally {
+        console.log("Auth initialization complete, setting loading to false");
         setLoading(false);
       }
     };

@@ -5,35 +5,45 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { userRole } = useAuth();
+  const { userRole, loading } = useAuth();
 
   useEffect(() => {
+    // Don't redirect until auth loading is complete
+    if (loading) {
+      console.log("Auth is still loading, waiting...");
+      return;
+    }
+
+    console.log("Routing user with role:", userRole);
+    
     if (userRole) {
       // Enhanced role-based routing
       switch (userRole) {
         case "manager":
-          // CSR Manager has full access to dashboard
+          console.log("Redirecting to dashboard as manager");
           navigate("/dashboard");
           break;
         case "editor":
-          // Editor goes to content management
+          console.log("Redirecting to content as editor");
           navigate("/content");
           break;
         case "me_officer":
-          // M&E Officer goes to surveys/monitoring
+          console.log("Redirecting to surveys as M&E officer");
           navigate("/surveys");
           break;
         case "recipient":
-          // Recipients only see their projects
+          console.log("Redirecting to projects as recipient");
           navigate("/projects");
           break;
         default:
+          console.log(`Unknown role: ${userRole}, redirecting to login`);
           navigate("/login");
       }
     } else {
+      console.log("No user role found, redirecting to login");
       navigate("/login");
     }
-  }, [navigate, userRole]);
+  }, [navigate, userRole, loading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
