@@ -10,6 +10,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 // Define role-based route access
 const roleAccess = {
   manager: ["/dashboard", "/projects", "/requests", "/reports", "/analytics", "/locations", "/surveys", "/mous", "/content", "/users", "/settings"],
+  csr_manager: ["/dashboard", "/projects", "/requests", "/reports", "/analytics", "/locations", "/surveys", "/mous", "/content", "/users", "/settings"],
   editor: ["/dashboard", "/content", "/reports", "/settings"],
   me_officer: ["/dashboard", "/surveys", "/projects", "/analytics", "/reports", "/settings"],
   recipient: ["/projects", "/reports", "/surveys", "/settings"]

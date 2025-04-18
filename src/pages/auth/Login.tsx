@@ -14,7 +14,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, userRole } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +22,7 @@ export default function Login() {
     
     try {
       await login(email, password);
+      console.log("Login successful, redirecting to app...");
       navigate("/app"); // Redirect to the index page which will handle role-based routing
     } catch (error) {
       console.error("Login error:", error);
@@ -84,7 +85,7 @@ export default function Login() {
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>1. Create a user in Supabase Authentication</p>
               <p>2. Go to the profiles table and update the user's role</p>
-              <p>3. Valid roles: manager, editor, me_officer, recipient</p>
+              <p>3. Valid roles: manager, csr_manager, editor, me_officer, recipient</p>
               <p>4. Default role for new users: public</p>
             </div>
           </div>

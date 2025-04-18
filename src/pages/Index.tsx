@@ -20,6 +20,7 @@ const Index = () => {
       // Enhanced role-based routing
       switch (userRole) {
         case "manager":
+        case "csr_manager":
           console.log("Redirecting to dashboard as manager");
           navigate("/dashboard");
           break;
