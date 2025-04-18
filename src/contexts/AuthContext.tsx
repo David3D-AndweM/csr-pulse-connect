@@ -2,37 +2,50 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
 import { toast } from "sonner";
+import { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
+  user: (User & { role?: string; name?: string }) | null;
   userRole: string | null;
   userEmail: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
+  user: null,
   userRole: null,
   userEmail: null,
   login: async () => {},
   logout: async () => {},
+  loading: true,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<(User & { role?: string; name?: string }) | null>(null);
   const [userRole, setUserRole] = useState<string | null>(localStorage.getItem("userRole"));
   const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem("userEmail"));
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const user = await authService.getCurrentUser();
-          setUserRole(user.role);
-          setUserEmail(user.email);
-        } catch (error) {
-          console.error("Failed to get current user:", error);
-          await logout();
-        }
+      try {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+        setUserRole(userData.role);
+        setUserEmail(userData.email);
+        localStorage.setItem("userRole", userData.role);
+        localStorage.setItem("userEmail", userData.email);
+      } catch (error) {
+        console.error("Failed to get current user:", error);
+        setUser(null);
+        setUserRole(null);
+        setUserEmail(null);
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("userEmail");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -41,12 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const data = await authService.login({ username: email, password });
-      const user = await authService.getCurrentUser();
-      setUserRole(user.role);
-      setUserEmail(user.email);
-      localStorage.setItem("userRole", user.role);
-      localStorage.setItem("userEmail", user.email);
+      await authService.login({ email, password });
+      const userData = await authService.getCurrentUser();
+      
+      setUser(userData);
+      setUserRole(userData.role);
+      setUserEmail(userData.email);
+      
+      localStorage.setItem("userRole", userData.role);
+      localStorage.setItem("userEmail", userData.email);
+      
       toast.success("Successfully logged in!");
     } catch (error) {
       console.error("Login failed:", error);
@@ -56,16 +73,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await authService.logout();
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userEmail");
-    setUserRole(null);
-    setUserEmail(null);
-    window.location.href = "/login";
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setUser(null);
+      setUserRole(null);
+      setUserEmail(null);
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userEmail");
+      window.location.href = "/login";
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ userRole, userEmail, login, logout }}>
+    <AuthContext.Provider value={{ user, userRole, userEmail, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

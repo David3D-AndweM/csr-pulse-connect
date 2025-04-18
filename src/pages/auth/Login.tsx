@@ -9,63 +9,25 @@ import { toast } from "sonner";
 import { LockKeyhole, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Demo accounts for testing
-const demoAccounts = {
-  manager: { 
-    email: "manager@clareo.org", 
-    password: "manager123", 
-    role: "manager" 
-  },
-  editor: { 
-    email: "editor@clareo.org", 
-    password: "editor123", 
-    role: "editor" 
-  },
-  me_officer: { 
-    email: "me@clareo.org", 
-    password: "me123", 
-    role: "me_officer" 
-  },
-  recipient: { 
-    email: "recipient@clareo.org", 
-    password: "recipient123", 
-    role: "recipient" 
-  }
-};
-
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // Find matching demo account
-    const account = Object.values(demoAccounts).find(
-      acc => acc.email === email && acc.password === password
-    );
-
-    if (account) {
-      // Use the login function from AuthContext
-      login(account.email, account.role);
-      
-      toast.success("Welcome to Clareo Non Profit!");
-      
-      // Redirect based on role
-      switch (account.role) {
-        case "manager":
-        case "editor":
-        case "me_officer":
-          navigate("/dashboard");
-          break;
-        case "recipient":
-          navigate("/projects");
-          break;
-      }
-    } else {
-      toast.error("Invalid credentials");
+    try {
+      await login(email, password);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login error:", error);
+      // Error toast is already shown in the login function
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -108,16 +70,21 @@ export default function Login() {
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full">Sign In</Button>
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing In..." : "Sign In"}
+            </Button>
           </form>
 
           <div className="mt-6">
-            <p className="text-sm text-muted-foreground mb-2">Demo Accounts:</p>
-            <div className="space-y-2 text-sm">
-              <p>CSR Manager: manager@clareo.org / manager123</p>
-              <p>Editor: editor@clareo.org / editor123</p>
-              <p>M&E Officer: me@clareo.org / me123</p>
-              <p>Recipient: recipient@clareo.org / recipient123</p>
+            <p className="text-sm text-muted-foreground mb-2">Demo Instructions:</p>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>1. Create a user in Supabase Authentication</p>
+              <p>2. Your user will automatically get a profile</p>
+              <p>3. Update the user's role in the profiles table to any of: admin, csr_manager, editor, recipient, or public</p>
             </div>
           </div>
         </CardContent>

@@ -1,5 +1,6 @@
 
 import axios from "axios";
+import { supabase } from "@/integrations/supabase/client";
 
 const BASE_URL = "http://localhost:8000/api";
 
@@ -10,11 +11,12 @@ export const apiClient = axios.create({
   },
 });
 
-// Add interceptor for JWT tokens
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Add interceptor for JWT tokens using Supabase session
+apiClient.interceptors.request.use(async (config) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (session?.access_token) {
+    config.headers.Authorization = `Bearer ${session.access_token}`;
   }
   return config;
 });
@@ -24,20 +26,24 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        const response = await apiClient.post("/token/refresh/", {
-          refresh: refreshToken,
-        });
-        localStorage.setItem("token", response.data.access);
-        originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          // If no session, redirect to login
+          window.location.href = "/login";
+          return Promise.reject(error);
+        }
+        
+        // Session should refresh automatically with Supabase
+        originalRequest.headers.Authorization = `Bearer ${session.access_token}`;
         return apiClient(originalRequest);
-      } catch (error) {
+      } catch (refreshError) {
         // If refresh fails, redirect to login
         window.location.href = "/login";
-        return Promise.reject(error);
+        return Promise.reject(refreshError);
       }
     }
     return Promise.reject(error);

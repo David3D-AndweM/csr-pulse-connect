@@ -1,26 +1,72 @@
 
-import { apiClient } from "@/lib/api-client";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface LoginCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
 export const authService = {
   async login(credentials: LoginCredentials) {
-    const response = await apiClient.post("/token/", credentials);
-    localStorage.setItem("token", response.data.access);
-    localStorage.setItem("refreshToken", response.data.refresh);
-    return response.data;
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    });
+    
+    if (error) {
+      throw error;
+    }
+    
+    return data;
   },
 
   async logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      throw error;
+    }
   },
 
   async getCurrentUser() {
-    const response = await apiClient.get("/users/me/");
-    return response.data;
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    // Get the user's profile information
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+      
+    if (error) {
+      throw error;
+    }
+    
+    return { 
+      ...user,
+      role: profile?.role || 'public',
+      name: profile?.name || user.email
+    };
+  },
+  
+  async register(credentials: LoginCredentials & { name: string }) {
+    const { data, error } = await supabase.auth.signUp({
+      email: credentials.email,
+      password: credentials.password,
+      options: {
+        data: {
+          name: credentials.name
+        }
+      }
+    });
+    
+    if (error) {
+      throw error;
+    }
+    
+    return data;
   },
 };
