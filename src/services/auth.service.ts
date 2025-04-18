@@ -34,7 +34,7 @@ export const authService = {
       throw new Error("User not found");
     }
     
-    // Get the user's profile information
+    // Get the user's profile information with better error handling
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
@@ -42,9 +42,16 @@ export const authService = {
       .single();
       
     if (error) {
-      throw error;
+      console.error("Error fetching profile:", error.message);
+      // Return user with default role if profile fetch fails
+      return { 
+        ...user,
+        role: 'public',
+        name: user.email
+      };
     }
     
+    console.log("Profile data retrieved:", profile);
     return { 
       ...user,
       role: profile?.role || 'public',

@@ -22,7 +22,7 @@ export default function Login() {
     
     try {
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/app"); // Redirect to the index page which will handle role-based routing
     } catch (error) {
       console.error("Login error:", error);
       // Error toast is already shown in the login function
@@ -83,8 +83,9 @@ export default function Login() {
             <p className="text-sm text-muted-foreground mb-2">Demo Instructions:</p>
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>1. Create a user in Supabase Authentication</p>
-              <p>2. Your user will automatically get a profile</p>
-              <p>3. Update the user's role in the profiles table to any of: admin, csr_manager, editor, recipient, or public</p>
+              <p>2. Go to the profiles table and update the user's role</p>
+              <p>3. Valid roles: manager, editor, me_officer, recipient</p>
+              <p>4. Default role for new users: public</p>
             </div>
           </div>
         </CardContent>

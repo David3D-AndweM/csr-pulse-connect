@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       try {
         const userData = await authService.getCurrentUser();
+        console.log("User data retrieved:", userData);
         setUser(userData);
         setUserRole(userData.role);
         setUserEmail(userData.email);
@@ -57,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await authService.login({ email, password });
       const userData = await authService.getCurrentUser();
       
+      console.log("Login successful. User role:", userData.role);
       setUser(userData);
       setUserRole(userData.role);
       setUserEmail(userData.email);
@@ -65,9 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("userEmail", userData.email);
       
       toast.success("Successfully logged in!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
-      toast.error("Login failed. Please check your credentials.");
+      toast.error(`Login failed: ${error.message || "Please check your credentials"}`);
       throw error;
     }
   };
