@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { requestService } from "@/services/request.service";
 import { toast } from "sonner";
+import { Request } from "@/types";
 
 export default function CreateRequest() {
   const navigate = useNavigate();

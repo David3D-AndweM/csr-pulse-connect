@@ -17,6 +17,7 @@ import { Search, Plus, UserPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "@/services/user.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { User } from "@/types";
 
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,8 +95,8 @@ export default function Users() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={user.active ? "success" : "secondary"}>
-                            {user.active ? "Active" : "Inactive"}
+                          <Badge variant="outline">
+                            {user.status || 'Active'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">

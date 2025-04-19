@@ -6,12 +6,7 @@ import { toast } from "sonner";
 export const requestService = {
   async getRequests(): Promise<Request[]> {
     try {
-      const { data, error } = await supabase
-        .from("requests")
-        .select(`
-          *,
-          profiles:requester (id, name, email, role, avatar)
-        `);
+      const { data, error } = await supabase.from("requests").select("*");
 
       if (error) throw error;
 
@@ -19,7 +14,7 @@ export const requestService = {
       const formattedData: Request[] = data.map((request) => ({
         id: request.id,
         type: request.type as "Facility" | "Support",
-        requester: request.profiles.name,
+        requester: request.requester,
         facility: request.facility,
         status: request.status as "pending" | "approved" | "rejected",
         submittedAt: request.submitted_at,
@@ -38,10 +33,7 @@ export const requestService = {
     try {
       const { data, error } = await supabase
         .from("requests")
-        .select(`
-          *,
-          profiles:requester (id, name, email, role, avatar)
-        `)
+        .select("*")
         .eq("id", id)
         .single();
 
@@ -51,7 +43,7 @@ export const requestService = {
       const request: Request = {
         id: data.id,
         type: data.type as "Facility" | "Support",
-        requester: data.profiles.name,
+        requester: data.requester,
         facility: data.facility,
         status: data.status as "pending" | "approved" | "rejected",
         submittedAt: data.submitted_at,
@@ -68,22 +60,14 @@ export const requestService = {
 
   async createRequest(request: Omit<Request, "id" | "requester" | "submittedAt">): Promise<string | null> {
     try {
-      // Get current user ID
-      const { data: userData } = await supabase.auth.getUser();
-      
-      if (!userData.user) {
-        toast.error("You must be logged in to create a request");
-        return null;
-      }
-
       const { data, error } = await supabase
         .from("requests")
         .insert({
           type: request.type,
-          requester: userData.user.id,
           facility: request.facility,
-          status: request.status,
           description: request.description,
+          status: request.status,
+          // requester will be set by the backend based on the current user
         })
         .select("id")
         .single();

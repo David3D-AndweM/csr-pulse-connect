@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { MOU } from "@/types";
 import { toast } from "sonner";
@@ -19,7 +20,7 @@ export const mouService = {
         status: mou.status as "pending" | "active" | "expired",
         description: mou.description,
         documentUrl: mou.document_url,
-        projectIds: mou.project_ids || [],
+        projectIds: [], // Handle this differently since project_ids might not exist
       }));
 
       return formattedData;
@@ -50,7 +51,7 @@ export const mouService = {
         status: data.status as "pending" | "active" | "expired",
         description: data.description,
         documentUrl: data.document_url,
-        projectIds: data.project_ids || [],
+        projectIds: [], // Handle this differently since project_ids might not exist
       };
 
       return mou;
@@ -70,7 +71,7 @@ export const mouService = {
           organization_name: mou.organizationName,
           start_date: mou.startDate,
           end_date: mou.endDate,
-          status: mou.status as "active" | "expired" | "pending",
+          status: mou.status as "pending" | "active" | "expired",
           description: mou.description,
           document_url: mou.documentUrl,
         })
