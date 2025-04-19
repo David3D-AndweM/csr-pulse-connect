@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Region } from "@/types";
 import { toast } from "sonner";
@@ -58,22 +57,22 @@ export const locationService = {
     }
   },
   
-  async createRegion(region: { name: string; country: string }): Promise<string | null> {
+  async createRegion(regionData: Omit<Region, 'id'>): Promise<Region | null> {
     try {
       const { data, error } = await supabase
         .from("regions")
         .insert({
-          name: region.name,
-          country: region.country,
-          project_count: 0
+          name: regionData.name,
+          country: regionData.country,
+          project_count: regionData.project_count || 0
         })
-        .select("id")
+        .select()
         .single();
       
       if (error) throw error;
       
       toast.success("Region created successfully");
-      return data.id;
+      return data as Region;
     } catch (error) {
       console.error("Error creating region:", error);
       toast.error("Failed to create region");

@@ -24,6 +24,8 @@ import CreateMOU from "./pages/CreateMOU";
 import MOUDetail from "./pages/MOUDetail";
 import CreateRequest from "./pages/CreateRequest";
 import Landing from "./pages/Landing";
+import PublicDashboard from "./pages/public/PublicDashboard";
+import Blog from "./pages/public/Blog";
 
 function AppRouter() {
   const { user, loading } = useAuth();
@@ -41,6 +43,8 @@ function AppRouter() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/landing" element={<Landing />} />
+        <Route path="/public/dashboard" element={<PublicDashboard />} />
+        <Route path="/public/blog" element={<Blog />} />
         <Route
           path="/dashboard"
           element={
