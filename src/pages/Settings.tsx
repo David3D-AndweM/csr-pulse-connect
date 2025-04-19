@@ -44,7 +44,7 @@ export default function Settings() {
             <CardContent className="pt-6">
               <div className="flex flex-col items-center">
                 <Avatar className="w-24 h-24 mb-4">
-                  <AvatarImage src={user?.avatar as string || ""} />
+                  <AvatarImage src={user?.avatar || ""} />
                   <AvatarFallback className="text-lg bg-primary/10 text-primary">
                     {user?.name ? getInitials(user.name) : "U"}
                   </AvatarFallback>

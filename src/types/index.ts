@@ -1,3 +1,4 @@
+
 export type CSRProject = {
   id: string;
   title: string;
@@ -50,7 +51,7 @@ export type Region = {
   id: string;
   name: string;
   country: string;
-  projectCount?: number; // Make projectCount optional
+  projectCount?: number;
 };
 
 export type Notification = {
