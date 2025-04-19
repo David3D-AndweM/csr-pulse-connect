@@ -27,12 +27,10 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        toast.success('Login successful');
-        console.info('Login successful, redirecting...');
-        navigate('/dashboard');
-      }
+      await login(email, password);
+      toast.success('Login successful');
+      console.info('Login successful, redirecting...');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Login failed. Please check your credentials and try again.');

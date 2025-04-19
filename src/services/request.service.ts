@@ -60,6 +60,14 @@ export const requestService = {
 
   async createRequest(request: Omit<Request, "id" | "requester" | "submittedAt">): Promise<string | null> {
     try {
+      // Get current user
+      const { data: userData } = await supabase.auth.getUser();
+      
+      if (!userData || !userData.user) {
+        toast.error("User must be authenticated to create a request");
+        return null;
+      }
+      
       const { data, error } = await supabase
         .from("requests")
         .insert({
@@ -67,7 +75,7 @@ export const requestService = {
           facility: request.facility,
           description: request.description,
           status: request.status,
-          // requester will be set by the backend based on the current user
+          requester: userData.user.id, // Set requester to current user ID
         })
         .select("id")
         .single();

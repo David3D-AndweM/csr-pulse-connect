@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { CSRProject } from "@/types";
+import { CSRProject, User } from "@/types";
 import { toast } from "sonner";
 
 export const projectService = {
@@ -31,8 +31,8 @@ export const projectService = {
           id: assignment.user_id,
           name: "",
           email: "",
-          role: ""
-        })),
+          role: "public" // Set default role to 'public' to satisfy TypeScript
+        }) as User),
         mouId: project.mou_id || null,
         recipientId: project.recipient_id || null,
       }));
@@ -76,8 +76,8 @@ export const projectService = {
           id: assignment.user_id,
           name: "",
           email: "",
-          role: ""
-        })),
+          role: "public" // Set default role to 'public' to satisfy TypeScript
+        }) as User),
         mouId: data.mou_id || null,
         recipientId: data.recipient_id || null,
       };

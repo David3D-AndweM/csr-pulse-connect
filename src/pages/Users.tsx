@@ -96,7 +96,7 @@ export default function Users() {
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">
-                            {user.status || 'Active'}
+                            {'Active'} {/* Default status since it doesn't exist in User type */}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
