@@ -1,8 +1,7 @@
-
-import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import logo from '../assets/logo.svg'; // You might need to add this image to your assets folder
+import logo from '../assets/logo.svg';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -11,10 +10,17 @@ export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero section */}
-      <header className="bg-gradient-to-r from-csr-primary to-csr-dark text-white">
+      <header className="bg-gradient-to-r from-primary to-primary/80 text-white">
         <nav className="container mx-auto py-4 px-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img src={logo || "https://via.placeholder.com/40"} alt="Clareo Non Profit" className="h-10" />
+            <img 
+              src={logo} 
+              alt="Clareo Non Profit" 
+              className="h-10 w-10 rounded-full" 
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/40';
+              }}
+            />
             <h1 className="text-xl font-bold">Clareo Non Profit</h1>
           </div>
           <div>
@@ -22,7 +28,7 @@ export default function Landing() {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/dashboard')}
-                className="text-white border-white hover:bg-white hover:text-csr-dark"
+                className="text-white border-white hover:bg-white hover:text-primary"
               >
                 Dashboard
               </Button>
@@ -30,7 +36,7 @@ export default function Landing() {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/login')}
-                className="text-white border-white hover:bg-white hover:text-csr-dark"
+                className="text-white border-white hover:bg-white hover:text-primary"
               >
                 Sign In
               </Button>
@@ -87,8 +93,7 @@ export default function Landing() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  <path d="M22 21v-2a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
               <h3 className="text-xl font-semibold mb-4">10,000+ Lives Impacted</h3>
