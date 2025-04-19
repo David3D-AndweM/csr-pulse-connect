@@ -23,6 +23,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import CreateMOU from "./pages/CreateMOU";
 import MOUDetail from "./pages/MOUDetail";
 import CreateRequest from "./pages/CreateRequest";
+import Landing from "./pages/Landing";
 
 function AppRouter() {
   const { user, loading } = useAuth();
@@ -39,6 +40,7 @@ function AppRouter() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/landing" element={<Landing />} />
         <Route
           path="/dashboard"
           element={
@@ -132,7 +134,7 @@ function AppRouter() {
             </PrivateRoute>
           }
         />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/" element={<Landing />} />
       </Routes>
     </Router>
   );

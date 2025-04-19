@@ -1,95 +1,348 @@
 
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
+import { analyticsService, AnalyticsSummary } from "@/services/analytics.service";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  AreaChart, 
+  BarChart, 
+  PieChart,
+  LineChart,
+  Line,
+  Area, 
+  Bar, 
+  Pie, 
+  Cell, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer 
+} from "recharts";
+import { ChartData } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Analytics() {
+  const [loading, setLoading] = useState(true);
+  const [summaryData, setSummaryData] = useState<AnalyticsSummary>({
+    totalProjects: 0,
+    activeProjects: 0,
+    completedProjects: 0,
+    pendingRequests: 0,
+    surveyResponseRate: 0,
+    budgetUtilization: 0
+  });
+  
+  const [categoryData, setCategoryData] = useState<ChartData>({
+    labels: [],
+    datasets: [{ label: "Projects by Category", data: [], backgroundColor: [] }]
+  });
+  
+  const [statusData, setStatusData] = useState<ChartData>({
+    labels: [],
+    datasets: [{ label: "Projects by Status", data: [], backgroundColor: [] }]
+  });
+  
+  const [regionData, setRegionData] = useState<ChartData>({
+    labels: [],
+    datasets: [{ label: "Projects by Region", data: [], backgroundColor: [] }]
+  });
+  
+  const [progressData, setProgressData] = useState<ChartData>({
+    labels: [],
+    datasets: []
+  });
+
+  useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch all analytics data in parallel
+        const [summary, byCategory, byStatus, byRegion, monthlyProgress] = await Promise.all([
+          analyticsService.getSummaryData(),
+          analyticsService.getProjectsByCategory(),
+          analyticsService.getProjectsByStatus(),
+          analyticsService.getProjectsByRegion(),
+          analyticsService.getMonthlyProgress()
+        ]);
+        
+        setSummaryData(summary);
+        setCategoryData(byCategory);
+        setStatusData(byStatus);
+        setRegionData(byRegion);
+        setProgressData(monthlyProgress);
+      } catch (error) {
+        console.error("Error loading analytics:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAnalyticsData();
+  }, []);
+
+  // Format data for charts
+  const formatCategoryData = categoryData.labels.map((label, i) => ({
+    name: label,
+    value: categoryData.datasets[0].data[i]
+  }));
+  
+  const formatStatusData = statusData.labels.map((label, i) => ({
+    name: label,
+    value: statusData.datasets[0].data[i]
+  }));
+  
+  const formatRegionData = regionData.labels.map((label, i) => ({
+    name: label,
+    value: regionData.datasets[0].data[i]
+  }));
+
+  // Format monthly progress data
+  const formatProgressData = progressData.labels.map((month, i) => {
+    const dataPoint: any = { name: month };
+    progressData.datasets.forEach(dataset => {
+      dataPoint[dataset.label] = dataset.data[i];
+    });
+    return dataPoint;
+  });
+  
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container py-6">
+          <h1 className="text-3xl font-bold mb-6">Analytics</h1>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-[400px]" />
+            ))}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-        <p className="text-gray-600 mt-1">View insights and metrics for your CSR initiatives</p>
-      </div>
-      
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-12 flex flex-col items-center justify-center">
-        <div className="w-16 h-16 bg-csr-light rounded-full flex items-center justify-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-csr-primary">
-            <path d="M3 3v18h18"></path>
-            <path d="m19 9-5 5-4-4-3 3"></path>
-          </svg>
+      <div className="container py-6">
+        <h1 className="text-3xl font-bold mb-6">Analytics</h1>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryData.totalProjects}</div>
+              <p className="text-xs text-muted-foreground">All projects in the system</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryData.activeProjects}</div>
+              <p className="text-xs text-muted-foreground">Projects in progress</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Budget Utilization</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryData.budgetUtilization}%</div>
+              <p className="text-xs text-muted-foreground">Of allocated budget</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Survey Response Rate</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryData.surveyResponseRate}%</div>
+              <p className="text-xs text-muted-foreground">Average completion rate</p>
+            </CardContent>
+          </Card>
         </div>
-        <h2 className="text-xl font-medium text-gray-900 mb-2">Analytics Dashboard</h2>
-        <p className="text-gray-500 text-center max-w-md mb-6">
-          This page will display interactive charts and visualizations for project metrics, budget allocation, impact assessment, and regional performance.
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-2xl">
-          <div className="border border-dashed border-gray-300 rounded p-4 flex flex-col items-center justify-center h-32">
-            <div className="text-csr-primary mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v8"></path>
-                <circle cx="12" cy="14" r="8"></circle>
-              </svg>
+        
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="regions">Regions</TabsTrigger>
+            <TabsTrigger value="progress">Progress</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Projects by Category</CardTitle>
+                  <CardDescription>Distribution of projects across categories</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={formatCategoryData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {formatCategoryData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={categoryData.datasets[0].backgroundColor[index] as string} 
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Projects by Status</CardTitle>
+                  <CardDescription>Current status of all projects</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={formatStatusData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {formatStatusData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={statusData.datasets[0].backgroundColor[index] as string} 
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            <p className="text-sm text-gray-600">Project Impact</p>
-          </div>
-          <div className="border border-dashed border-gray-300 rounded p-4 flex flex-col items-center justify-center h-32">
-            <div className="text-csr-primary mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M16 12h-6.5a2 2 0 1 0 0 4H12"></path>
-                <path d="M10 8h6.5a2 2 0 1 1 0 4H14"></path>
-              </svg>
-            </div>
-            <p className="text-sm text-gray-600">Budget Utilization</p>
-          </div>
-          <div className="border border-dashed border-gray-300 rounded p-4 flex flex-col items-center justify-center h-32">
-            <div className="text-csr-primary mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 7 8 20l-5-5"></path>
-                <path d="M21 11 8 24l-5-5"></path>
-                <path d="m21 3-5.5 5.5"></path>
-                <path d="M14 6.5 8 12.5l-5-5"></path>
-                <path d="M14 10.5 8 16.5l-5-5"></path>
-              </svg>
-            </div>
-            <p className="text-sm text-gray-600">Milestones</p>
-          </div>
-          <div className="border border-dashed border-gray-300 rounded p-4 flex flex-col items-center justify-center h-32">
-            <div className="text-csr-primary mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m7.5 4.27 9 5.15"></path>
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-                <path d="m3.3 7 8.7 5 8.7-5"></path>
-                <path d="M12 22V12"></path>
-              </svg>
-            </div>
-            <p className="text-sm text-gray-600">Reports Overview</p>
-          </div>
-          <div className="border border-dashed border-gray-300 rounded p-4 flex flex-col items-center justify-center h-32">
-            <div className="text-csr-primary mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="18" height="10" x="3" y="8" rx="1"></rect>
-                <path d="M7 8v10"></path>
-                <path d="M17 8v10"></path>
-                <path d="m3 12 4-2"></path>
-                <path d="m3 16 4-2"></path>
-                <path d="m21 12-4-2"></path>
-                <path d="m21 16-4-2"></path>
-                <path d="M7 6h10"></path>
-                <path d="M9 4h6"></path>
-              </svg>
-            </div>
-            <p className="text-sm text-gray-600">Regional Distribution</p>
-          </div>
-          <div className="border border-dashed border-gray-300 rounded p-4 flex flex-col items-center justify-center h-32">
-            <div className="text-csr-primary mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" x2="12" y1="16" y2="12"></line>
-                <line x1="12" x2="12.01" y1="8" y2="8"></line>
-              </svg>
-            </div>
-            <p className="text-sm text-gray-600">Impact Overview</p>
-          </div>
-        </div>
+          </TabsContent>
+          
+          <TabsContent value="projects" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Project Distribution</CardTitle>
+                <CardDescription>Number of projects by category</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={formatCategoryData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar 
+                        dataKey="value" 
+                        name="Number of Projects" 
+                        fill="#1e8a5f" 
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="regions" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Projects by Region</CardTitle>
+                <CardDescription>Geographic distribution of projects</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={formatRegionData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar 
+                        dataKey="value" 
+                        name="Number of Projects" 
+                        fill="#30b679" 
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="progress" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Project Progress Over Time</CardTitle>
+                <CardDescription>Monthly progress of active projects</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={formatProgressData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      {progressData.datasets.map((dataset, i) => (
+                        <Line 
+                          key={i}
+                          type="monotone" 
+                          dataKey={dataset.label} 
+                          stroke={dataset.borderColor as string} 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );
