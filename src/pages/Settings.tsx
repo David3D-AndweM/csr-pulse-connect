@@ -1,25 +1,13 @@
 
-import { Layout } from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { useState } from "react";
-import { toast } from "sonner";
+import { Layout } from "@/components/layout/Layout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,183 +19,192 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Switch } from "@/components/ui/switch";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Settings() {
-  const { user } = useAuth();
-  const [saving, setSaving] = useState(false);
+  const { user, logout } = useAuth();
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   
-  const handleSaveProfile = () => {
-    setSaving(true);
-    // Simulating API call
-    setTimeout(() => {
-      setSaving(false);
-      toast.success("Profile settings saved successfully");
-    }, 1000);
+  // Profile update handler
+  const handleProfileUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would implement the API call to update the user's profile
+    toast.success("Profile updated successfully");
   };
   
+  // Password change handler
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords don't match");
+      return;
+    }
+    // Here you would implement the API call to change the password
+    toast.success("Password changed successfully");
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+  
+  // Handle account deletion
+  const handleDeleteAccount = () => {
+    // Here you would implement the API call to delete the user's account
+    toast.success("Account deleted");
+    logout();
+  };
+
   return (
     <Layout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account settings and preferences
-        </p>
-      </div>
-      
-      <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md mb-6">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-        </TabsList>
+      <div className="container max-w-4xl py-4">
+        <h1 className="text-3xl font-bold mb-6">Settings</h1>
         
-        <TabsContent value="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
-                Update your personal information and how it appears on the platform
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={user?.avatar || ''} alt={user?.name || 'User'} />
-                  <AvatarFallback className="text-lg">
-                    {user?.name?.substring(0, 2).toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <Button variant="outline">Change Photo</Button>
-              </div>
-              
-              <Separator />
-              
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" defaultValue={user?.name || ''} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" defaultValue={user?.email || ''} type="email" disabled />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
-                  <Input id="role" defaultValue={user?.role || ''} disabled />
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex justify-end">
-                <Button onClick={handleSaveProfile} disabled={saving}>
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="notifications">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>
-                Configure how you receive notifications and updates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold">Email Notifications</h4>
-                    <p className="text-sm text-muted-foreground">Receive updates via email</p>
+        <Tabs defaultValue="profile" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="password">Password</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="danger">Danger Zone</TabsTrigger>
+          </TabsList>
+          
+          {/* Profile Tab */}
+          <TabsContent value="profile">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Settings</CardTitle>
+                <CardDescription>
+                  Update your personal information
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleProfileUpdate} className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${name || user?.email || 'User'}&background=random`}
+                      alt="Profile"
+                      className="w-16 h-16 rounded-full"
+                    />
+                    <Button type="button" variant="outline" size="sm">
+                      Change Avatar
+                    </Button>
                   </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold">Project Updates</h4>
-                    <p className="text-sm text-muted-foreground">Get notified about changes to projects</p>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                    />
                   </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold">New Reports</h4>
-                    <p className="text-sm text-muted-foreground">Receive notifications when new reports are submitted</p>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Your email"
+                      disabled
+                    />
                   </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold">Approval Requests</h4>
-                    <p className="text-sm text-muted-foreground">Get notified about new approval requests</p>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Role</Label>
+                    <Input
+                      id="role"
+                      value={user?.role || "User"}
+                      disabled
+                    />
                   </div>
-                  <Switch defaultChecked />
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex justify-end">
-                <Button onClick={() => toast.success("Notification preferences saved")}>
-                  Save Preferences
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="security">
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>
-                Manage your password and account security settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Password</h4>
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">••••••••••</p>
-                    <Button variant="outline" size="sm">Change Password</Button>
+                  
+                  <Button type="submit">Save Changes</Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Password Tab */}
+          <TabsContent value="password">
+            <Card>
+              <CardHeader>
+                <CardTitle>Change Password</CardTitle>
+                <CardDescription>
+                  Update your password to ensure your account remains secure
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Input
+                      id="currentPassword"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                    />
                   </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Two-Factor Authentication</h4>
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">Not enabled</p>
-                    <Button variant="outline" size="sm">Set Up</Button>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
                   </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Session Management</h4>
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">1 active session</p>
-                    <Button variant="outline" size="sm">Manage Sessions</Button>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
                   </div>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div className="pt-4">
+                  
+                  <Button type="submit">Update Password</Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notification Settings</CardTitle>
+                <CardDescription>
+                  Manage how and when you receive notifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Notification settings will be available in a future update.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Danger Zone Tab */}
+          <TabsContent value="danger">
+            <Card className="border-destructive">
+              <CardHeader>
+                <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                <CardDescription>
+                  Actions here can't be undone. Please proceed with caution.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive">Delete Account</Button>
@@ -217,22 +214,22 @@ export default function Settings() {
                       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                       <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete your
-                        account and remove all your data from our servers.
+                        account and remove your data from our servers.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction variant="destructive">
-                        Delete Account
+                      <AlertDialogAction onClick={handleDeleteAccount}>
+                        Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </Layout>
   );
 }

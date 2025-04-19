@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { MOU } from "@/types";
 import { toast } from "sonner";
@@ -6,9 +5,7 @@ import { toast } from "sonner";
 export const mouService = {
   async getMOUs(): Promise<MOU[]> {
     try {
-      const { data, error } = await supabase
-        .from("mous")
-        .select("*");
+      const { data, error } = await supabase.from("mous").select("*");
 
       if (error) throw error;
 
@@ -19,23 +16,11 @@ export const mouService = {
         organizationName: mou.organization_name,
         startDate: mou.start_date,
         endDate: mou.end_date,
-        status: mou.status as "active" | "expired" | "pending",
+        status: mou.status as "pending" | "active" | "expired",
         description: mou.description,
         documentUrl: mou.document_url,
-        projectIds: [], // We'll populate this separately
+        projectIds: mou.project_ids || [],
       }));
-
-      // Fetch related projects for each MOU
-      for (const mou of formattedData) {
-        const { data: projectData, error: projectError } = await supabase
-          .from("projects")
-          .select("id")
-          .eq("mou_id", mou.id);
-
-        if (!projectError && projectData) {
-          mou.projectIds = projectData.map((project) => project.id);
-        }
-      }
 
       return formattedData;
     } catch (error) {
@@ -62,21 +47,11 @@ export const mouService = {
         organizationName: data.organization_name,
         startDate: data.start_date,
         endDate: data.end_date,
-        status: data.status as "active" | "expired" | "pending",
+        status: data.status as "pending" | "active" | "expired",
         description: data.description,
         documentUrl: data.document_url,
-        projectIds: [],
+        projectIds: data.project_ids || [],
       };
-
-      // Fetch related projects
-      const { data: projectData, error: projectError } = await supabase
-        .from("projects")
-        .select("id")
-        .eq("mou_id", id);
-
-      if (!projectError && projectData) {
-        mou.projectIds = projectData.map((project) => project.id);
-      }
 
       return mou;
     } catch (error) {

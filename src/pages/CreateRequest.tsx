@@ -1,181 +1,128 @@
 
-import { Layout } from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { requestService } from "@/services/request.service";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Layout } from "@/components/layout/Layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { requestService } from "@/services/request.service";
 import { toast } from "sonner";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Request } from "@/types";
-
-const requestSchema = z.object({
-  type: z.enum(["Facility", "Support"]),
-  facility: z.string().min(3, "Facility/Support name is required"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-});
-
-type RequestFormValues = z.infer<typeof requestSchema>;
 
 export default function CreateRequest() {
   const navigate = useNavigate();
-  
-  const form = useForm<RequestFormValues>({
-    resolver: zodResolver(requestSchema),
-    defaultValues: {
-      type: "Facility",
-      facility: "",
-      description: "",
-    },
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    type: "Facility" as "Facility" | "Support",
+    facility: "",
+    description: "",
   });
 
-  const onSubmit = async (values: RequestFormValues) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleTypeChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, type: value as "Facility" | "Support" }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
     try {
-      const requestData = {
-        type: values.type,
-        facility: values.facility,
-        description: values.description,
-        status: "pending" as const, // Use const assertion to fix type issue
+      const request = {
+        type: formData.type,
+        facility: formData.facility,
+        description: formData.description,
+        status: "pending" as "pending" | "approved" | "rejected"
       };
 
-      const requestId = await requestService.createRequest(requestData);
+      const id = await requestService.createRequest(request);
       
-      if (requestId) {
-        toast.success("Request submitted successfully");
+      if (id) {
+        toast.success("Request created successfully");
         navigate("/requests");
       }
     } catch (error) {
-      console.error("Error submitting request:", error);
-      toast.error("Failed to submit request");
+      console.error("Error creating request:", error);
+      toast.error("Failed to create request");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Layout>
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/requests">Requests</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink>New Request</BreadcrumbLink>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Submit New Request</h1>
-        <p className="text-muted-foreground mt-1">
-          Request facility usage or support for your CSR activities
-        </p>
-      </div>
-      
-      <div className="bg-white p-6 rounded-lg border max-w-2xl">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Request Type */}
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Request Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select request type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Facility">Facility Usage</SelectItem>
-                      <SelectItem value="Support">Support Request</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            {/* Facility/Support Name */}
-            <FormField
-              control={form.control}
-              name="facility"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {form.watch("type") === "Facility" ? "Facility Name" : "Support Type"}
-                  </FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder={
-                        form.watch("type") === "Facility" 
-                        ? "e.g. Conference Room A, Training Hall" 
-                        : "e.g. Technical Support, Financial Aid"
-                      } 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      rows={5} 
-                      placeholder="Please provide details about your request..." 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="flex justify-end space-x-4 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate("/requests")}>
-                Cancel
+      <div className="container max-w-2xl py-4">
+        <Button
+          variant="ghost"
+          className="mb-4"
+          onClick={() => navigate(-1)}
+        >
+          ← Back
+        </Button>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Create New Request</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="type">Request Type</Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={handleTypeChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a request type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="Facility">Facility</SelectItem>
+                      <SelectItem value="Support">Support</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="facility">Facility/Resource Name</Label>
+                <Input
+                  id="facility"
+                  name="facility"
+                  value={formData.facility}
+                  onChange={handleChange}
+                  placeholder="Enter name of facility or resource"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Please describe your request in detail"
+                  rows={5}
+                  required
+                />
+              </div>
+              
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Submitting..." : "Submit Request"}
               </Button>
-              <Button type="submit">Submit Request</Button>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

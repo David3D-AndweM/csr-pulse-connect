@@ -1,69 +1,48 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { CSRProject, User } from "@/types";
+import { Project } from "@/types";
 import { toast } from "sonner";
 
 export const projectService = {
-  async getProjects(): Promise<CSRProject[]> {
+  async getProjects(): Promise<Project[]> {
     try {
-      const { data, error } = await supabase
-        .from("projects")
-        .select(`
-          *,
-          recipient_id (id, name, email, role, avatar),
-          mou_id (id, title, organization_name)
-        `);
+      const { data, error } = await supabase.from("projects").select("*");
 
       if (error) throw error;
 
-      // Process the data to match our type structure
-      const formattedData = data.map((project) => {
-        // Safely handle potential null or error values for mou_id
-        const mouId = project.mou_id && typeof project.mou_id === 'object' && !('error' in project.mou_id) 
-          ? project.mou_id.id 
-          : undefined;
+      // Format the data to match our Project type
+      const formattedData: Project[] = await Promise.all(
+        data.map(async (project) => {
+          let mouName = null;
+          let mouStatus = null;
 
-        return {
-          id: project.id,
-          title: project.title,
-          description: project.description,
-          status: project.status,
-          progress: project.progress,
-          location: project.location,
-          category: project.category,
-          budget: project.budget,
-          startDate: project.start_date,
-          endDate: project.end_date,
-          createdAt: project.created_at,
-          projectType: project.project_type,
-          // Populate with empty array by default, we'll fetch assigned users separately
-          assignedUsers: [],
-          // Format the foreign key references
-          mouId,
-          recipientId: project.recipient_id?.id,
-        };
-      });
+          // Only query MOU if project has a mou_id
+          if (project.mou_id) {
+            const { data: mouData, error: mouError } = await supabase
+              .from("mous")
+              .select("title, status")
+              .eq("id", project.mou_id)
+              .single();
 
-      // Fetch assigned users for each project
-      for (const project of formattedData) {
-        const { data: assignmentData, error: assignmentError } = await supabase
-          .from("project_assignments")
-          .select(`
-            user_id,
-            profiles:user_id (id, name, email, role, avatar)
-          `)
-          .eq("project_id", project.id);
+            if (!mouError && mouData) {
+              mouName = mouData.title;
+              mouStatus = mouData.status;
+            }
+          }
 
-        if (!assignmentError && assignmentData) {
-          project.assignedUsers = assignmentData.map((assignment) => ({
-            id: assignment.profiles.id,
-            name: assignment.profiles.name,
-            role: assignment.profiles.role,
-            email: assignment.profiles.email,
-            avatar: assignment.profiles.avatar,
-          }));
-        }
-      }
+          return {
+            id: project.id,
+            title: project.title,
+            status: project.status,
+            startDate: project.start_date,
+            endDate: project.end_date,
+            budget: project.budget,
+            description: project.description,
+            mouId: project.mou_id || null,
+            mouName: mouName,
+            mouStatus: mouStatus,
+          };
+        })
+      );
 
       return formattedData;
     } catch (error) {
@@ -73,62 +52,46 @@ export const projectService = {
     }
   },
 
-  async getProjectById(id: string): Promise<CSRProject | null> {
+  async getProjectById(id: string): Promise<Project | null> {
     try {
       const { data, error } = await supabase
         .from("projects")
-        .select(`
-          *,
-          recipient_id (id, name, email, role, avatar),
-          mou_id (id, title, organization_name)
-        `)
+        .select("*")
         .eq("id", id)
         .single();
 
       if (error) throw error;
 
-      // Safely handle potential null or error values for mou_id
-      const mouId = data.mou_id && typeof data.mou_id === 'object' && !('error' in data.mou_id) 
-        ? data.mou_id.id 
-        : undefined;
+      let mouName = null;
+      let mouStatus = null;
 
-      // Format the data to match our type
-      const project: CSRProject = {
+      // Only query MOU if project has a mou_id
+      if (data.mou_id) {
+        const { data: mouData, error: mouError } = await supabase
+          .from("mous")
+          .select("title, status")
+          .eq("id", data.mou_id)
+          .single();
+
+        if (!mouError && mouData) {
+          mouName = mouData.title;
+          mouStatus = mouData.status;
+        }
+      }
+
+      // Format the data to match our Project type
+      const project: Project = {
         id: data.id,
         title: data.title,
-        description: data.description,
         status: data.status,
-        progress: data.progress,
-        location: data.location,
-        category: data.category,
-        budget: data.budget,
         startDate: data.start_date,
         endDate: data.end_date,
-        createdAt: data.created_at,
-        projectType: data.project_type,
-        assignedUsers: [],
-        mouId,
-        recipientId: data.recipient_id?.id,
+        budget: data.budget,
+        description: data.description,
+        mouId: data.mou_id || null,
+        mouName: mouName,
+        mouStatus: mouStatus,
       };
-
-      // Fetch assigned users
-      const { data: assignmentData, error: assignmentError } = await supabase
-        .from("project_assignments")
-        .select(`
-          user_id,
-          profiles:user_id (id, name, email, role, avatar)
-        `)
-        .eq("project_id", id);
-
-      if (!assignmentError && assignmentData) {
-        project.assignedUsers = assignmentData.map((assignment) => ({
-          id: assignment.profiles.id,
-          name: assignment.profiles.name,
-          role: assignment.profiles.role,
-          email: assignment.profiles.email,
-          avatar: assignment.profiles.avatar,
-        }));
-      }
 
       return project;
     } catch (error) {
@@ -138,43 +101,23 @@ export const projectService = {
     }
   },
 
-  async createProject(project: Partial<CSRProject>): Promise<string | null> {
+  async createProject(project: Omit<Project, "id" | "mouName" | "mouStatus">): Promise<string | null> {
     try {
-      // First, insert the project data
       const { data, error } = await supabase
         .from("projects")
         .insert({
           title: project.title,
-          description: project.description,
-          status: project.status || "planned",
-          progress: project.progress || 0,
-          location: project.location,
-          category: project.category,
-          budget: project.budget,
+          status: project.status,
           start_date: project.startDate,
           end_date: project.endDate,
-          project_type: project.projectType,
+          budget: project.budget,
+          description: project.description,
           mou_id: project.mouId,
-          recipient_id: project.recipientId,
         })
         .select("id")
         .single();
 
       if (error) throw error;
-
-      // Then, if there are assigned users, create the assignments
-      if (project.assignedUsers && project.assignedUsers.length > 0) {
-        const assignments = project.assignedUsers.map((user) => ({
-          project_id: data.id,
-          user_id: user.id,
-        }));
-
-        const { error: assignmentError } = await supabase
-          .from("project_assignments")
-          .insert(assignments);
-
-        if (assignmentError) throw assignmentError;
-      }
 
       toast.success("Project created successfully");
       return data.id;
@@ -185,53 +128,22 @@ export const projectService = {
     }
   },
 
-  async updateProject(id: string, project: Partial<CSRProject>): Promise<boolean> {
+  async updateProject(id: string, project: Partial<Project>): Promise<boolean> {
     try {
-      // Update the project data
       const { error } = await supabase
         .from("projects")
         .update({
           title: project.title,
-          description: project.description,
           status: project.status,
-          progress: project.progress,
-          location: project.location,
-          category: project.category,
-          budget: project.budget,
           start_date: project.startDate,
           end_date: project.endDate,
-          project_type: project.projectType,
+          budget: project.budget,
+          description: project.description,
           mou_id: project.mouId,
-          recipient_id: project.recipientId,
         })
         .eq("id", id);
 
       if (error) throw error;
-
-      // If assigned users are provided, update the assignments
-      if (project.assignedUsers) {
-        // First, delete all existing assignments
-        const { error: deleteError } = await supabase
-          .from("project_assignments")
-          .delete()
-          .eq("project_id", id);
-
-        if (deleteError) throw deleteError;
-
-        // Then, insert the new assignments
-        if (project.assignedUsers.length > 0) {
-          const assignments = project.assignedUsers.map((user) => ({
-            project_id: id,
-            user_id: user.id,
-          }));
-
-          const { error: assignmentError } = await supabase
-            .from("project_assignments")
-            .insert(assignments);
-
-          if (assignmentError) throw assignmentError;
-        }
-      }
 
       toast.success("Project updated successfully");
       return true;
@@ -244,11 +156,7 @@ export const projectService = {
 
   async deleteProject(id: string): Promise<boolean> {
     try {
-      // Delete the project
-      const { error } = await supabase
-        .from("projects")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("projects").delete().eq("id", id);
 
       if (error) throw error;
 
@@ -259,5 +167,5 @@ export const projectService = {
       toast.error("Failed to delete project");
       return false;
     }
-  }
+  },
 };
