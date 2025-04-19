@@ -58,7 +58,7 @@ export const locationService = {
     }
   },
   
-  async createRegion(region: Omit<Region, "id">): Promise<string | null> {
+  async createRegion(region: { name: string; country: string }): Promise<string | null> {
     try {
       const { data, error } = await supabase
         .from("regions")
