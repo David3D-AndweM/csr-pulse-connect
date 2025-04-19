@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, FileText } from "lucide-react";
+import { Eye, FileText, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { mouService } from "@/services/mou.service";
 import { Skeleton } from "@/components/ui/skeleton";

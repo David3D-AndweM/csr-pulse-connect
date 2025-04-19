@@ -18,10 +18,10 @@ export const requestService = {
       // Format the data to match our type
       const formattedData: Request[] = data.map((request) => ({
         id: request.id,
-        type: request.type,
+        type: request.type as "Facility" | "Support",
         requester: request.profiles.name,
         facility: request.facility,
-        status: request.status,
+        status: request.status as "pending" | "approved" | "rejected",
         submittedAt: request.submitted_at,
         description: request.description,
       }));
@@ -50,10 +50,10 @@ export const requestService = {
       // Format the data to match our type
       const request: Request = {
         id: data.id,
-        type: data.type,
+        type: data.type as "Facility" | "Support",
         requester: data.profiles.name,
         facility: data.facility,
-        status: data.status,
+        status: data.status as "pending" | "approved" | "rejected",
         submittedAt: data.submitted_at,
         description: data.description,
       };
@@ -82,7 +82,7 @@ export const requestService = {
           type: request.type,
           requester: userData.user.id,
           facility: request.facility,
-          status: request.status || "pending",
+          status: request.status,
           description: request.description,
         })
         .select("id")

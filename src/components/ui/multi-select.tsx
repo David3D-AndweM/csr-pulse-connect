@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { X } from "lucide-react"
 import {
@@ -42,7 +41,6 @@ export function MultiSelect({
   })
 
   React.useEffect(() => {
-    // Update selected options when value changes externally
     setSelected(options.filter(option => value.includes(option.value)))
   }, [value, options])
   
@@ -66,7 +64,7 @@ export function MultiSelect({
     onChange(updated.map(option => option.value))
   }
   
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace" && !e.currentTarget.value && selected.length > 0) {
       const lastSelected = selected[selected.length - 1]
       handleRemove(lastSelected.value)

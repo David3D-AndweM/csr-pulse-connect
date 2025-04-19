@@ -31,6 +31,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Request } from "@/types";
 
 const requestSchema = z.object({
   type: z.enum(["Facility", "Support"]),
@@ -58,7 +59,7 @@ export default function CreateRequest() {
         type: values.type,
         facility: values.facility,
         description: values.description,
-        status: "pending", // Always start with pending status
+        status: "pending" as const, // Use const assertion to fix type issue
       };
 
       const requestId = await requestService.createRequest(requestData);

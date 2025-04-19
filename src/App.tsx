@@ -1,3 +1,4 @@
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -9,7 +10,7 @@ import Projects from "./pages/Projects";
 import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Locations from "./pages/Locations";
-import Login from "./pages/Login";
+import Login from "./pages/auth/Login";
 import Settings from "./pages/Settings";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import MOUs from "./pages/MOUs";

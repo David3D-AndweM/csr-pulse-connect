@@ -19,7 +19,7 @@ export const mouService = {
         organizationName: mou.organization_name,
         startDate: mou.start_date,
         endDate: mou.end_date,
-        status: mou.status,
+        status: mou.status as "active" | "expired" | "pending",
         description: mou.description,
         documentUrl: mou.document_url,
         projectIds: [], // We'll populate this separately
@@ -62,7 +62,7 @@ export const mouService = {
         organizationName: data.organization_name,
         startDate: data.start_date,
         endDate: data.end_date,
-        status: data.status,
+        status: data.status as "active" | "expired" | "pending",
         description: data.description,
         documentUrl: data.document_url,
         projectIds: [],
@@ -95,7 +95,7 @@ export const mouService = {
           organization_name: mou.organizationName,
           start_date: mou.startDate,
           end_date: mou.endDate,
-          status: mou.status,
+          status: mou.status as "active" | "expired" | "pending",
           description: mou.description,
           document_url: mou.documentUrl,
         })

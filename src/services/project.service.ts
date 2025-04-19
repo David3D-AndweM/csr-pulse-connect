@@ -17,25 +17,32 @@ export const projectService = {
       if (error) throw error;
 
       // Process the data to match our type structure
-      const formattedData = data.map((project) => ({
-        id: project.id,
-        title: project.title,
-        description: project.description,
-        status: project.status,
-        progress: project.progress,
-        location: project.location,
-        category: project.category,
-        budget: project.budget,
-        startDate: project.start_date,
-        endDate: project.end_date,
-        createdAt: project.created_at,
-        projectType: project.project_type,
-        // Populate with empty array by default, we'll fetch assigned users separately
-        assignedUsers: [],
-        // Format the foreign key references
-        mouId: project.mou_id?.id,
-        recipientId: project.recipient_id?.id,
-      }));
+      const formattedData = data.map((project) => {
+        // Safely handle potential null or error values for mou_id
+        const mouId = project.mou_id && typeof project.mou_id === 'object' && !('error' in project.mou_id) 
+          ? project.mou_id.id 
+          : undefined;
+
+        return {
+          id: project.id,
+          title: project.title,
+          description: project.description,
+          status: project.status,
+          progress: project.progress,
+          location: project.location,
+          category: project.category,
+          budget: project.budget,
+          startDate: project.start_date,
+          endDate: project.end_date,
+          createdAt: project.created_at,
+          projectType: project.project_type,
+          // Populate with empty array by default, we'll fetch assigned users separately
+          assignedUsers: [],
+          // Format the foreign key references
+          mouId,
+          recipientId: project.recipient_id?.id,
+        };
+      });
 
       // Fetch assigned users for each project
       for (const project of formattedData) {
@@ -80,6 +87,11 @@ export const projectService = {
 
       if (error) throw error;
 
+      // Safely handle potential null or error values for mou_id
+      const mouId = data.mou_id && typeof data.mou_id === 'object' && !('error' in data.mou_id) 
+        ? data.mou_id.id 
+        : undefined;
+
       // Format the data to match our type
       const project: CSRProject = {
         id: data.id,
@@ -95,7 +107,7 @@ export const projectService = {
         createdAt: data.created_at,
         projectType: data.project_type,
         assignedUsers: [],
-        mouId: data.mou_id?.id,
+        mouId,
         recipientId: data.recipient_id?.id,
       };
 
