@@ -3,12 +3,13 @@ import { Calendar, MapPin, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CSRProject } from "@/types";
+import { Link } from "react-router-dom";
 
 interface ProjectCardProps {
   project: CSRProject;
 }
 
-const statusColors = {
+const statusColors: Record<string, string> = {
   'planned': 'bg-blue-100 text-blue-800',
   'in-progress': 'bg-amber-100 text-amber-800',
   'completed': 'bg-green-100 text-green-800',
@@ -60,13 +61,21 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <span className="font-medium">{project.progress}%</span> completed
           </div>
           <div className="flex -space-x-2">
-            {project.assignedUsers.slice(0, 3).map((user) => (
-              <img
-                key={user.id}
-                className="h-6 w-6 rounded-full ring-2 ring-white"
-                src={user.avatar}
-                alt={user.name}
-              />
+            {project.assignedUsers.slice(0, 3).map((user, idx) => (
+              <div
+                key={idx}
+                className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-600 ring-2 ring-white overflow-hidden"
+              >
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  user.name.charAt(0)
+                )}
+              </div>
             ))}
             {project.assignedUsers.length > 3 && (
               <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-600 ring-2 ring-white">
@@ -78,12 +87,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </div>
       
       <div className="border-t border-gray-200 grid grid-cols-2 divide-x">
-        <Button variant="ghost" className="py-2 px-4 text-xs font-medium rounded-none text-csr-primary hover:text-csr-primary hover:bg-csr-light">
-          View Details
-        </Button>
-        <Button variant="ghost" className="py-2 px-4 text-xs font-medium rounded-none text-csr-primary hover:text-csr-primary hover:bg-csr-light">
-          Update Status
-        </Button>
+        <Link to={`/projects/${project.id}`}>
+          <Button variant="ghost" className="py-2 px-4 text-xs font-medium rounded-none text-csr-primary hover:text-csr-primary hover:bg-csr-light w-full">
+            View Details
+          </Button>
+        </Link>
+        <Link to={`/projects/${project.id}/edit`}>
+          <Button variant="ghost" className="py-2 px-4 text-xs font-medium rounded-none text-csr-primary hover:text-csr-primary hover:bg-csr-light w-full">
+            Update Status
+          </Button>
+        </Link>
       </div>
     </div>
   );
